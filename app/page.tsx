@@ -132,7 +132,10 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">🎯 Mission Control</h1>
             <div className="flex gap-4">
-              <Link href="/agents" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <Link href="/" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Dashboard
+              </Link>
+              <Link href="/agents" className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                 Agents
               </Link>
               <Link href="/tasks" className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
