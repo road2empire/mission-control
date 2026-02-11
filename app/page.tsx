@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 
 interface Agent {
   id: string;
@@ -35,19 +37,31 @@ interface Activity {
   timestamp: string;
 }
 
-import { api } from '@/lib/api';
-
 export default function Home() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Check authentication on mount
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000); // Refresh every 5s
-    return () => clearInterval(interval);
-  }, []);
+    const auth = localStorage.getItem('mission-control-auth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchData();
+      const interval = setInterval(fetchData, 5000); // Refresh every 5s
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
   async function fetchData() {
     try {
@@ -63,7 +77,17 @@ export default function Home() {
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      setLoading(false);
     }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('mission-control-auth');
+    router.push('/login');
+  };
+
+  if (!isAuthenticated) {
+    return null; // Will redirect to login
   }
 
   const tasksByStatus = {
@@ -114,6 +138,12 @@ export default function Home() {
               <Link href="/tasks" className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                 Tasks
               </Link>
+              <button 
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
