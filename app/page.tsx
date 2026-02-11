@@ -35,7 +35,7 @@ interface Activity {
   timestamp: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { api } from '@/lib/api';
 
 export default function Home() {
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -51,15 +51,15 @@ export default function Home() {
 
   async function fetchData() {
     try {
-      const [agentsRes, tasksRes, activitiesRes] = await Promise.all([
-        fetch(`${API_URL}/agents`),
-        fetch(`${API_URL}/tasks`),
-        fetch(`${API_URL}/activities?limit=20`)
+      const [agentsData, tasksData, activitiesData] = await Promise.all([
+        api.get('/agents'),
+        api.get('/tasks'),
+        api.get('/activities', { limit: '20' })
       ]);
       
-      setAgents(await agentsRes.json());
-      setTasks(await tasksRes.json());
-      setActivities(await activitiesRes.json());
+      setAgents(agentsData);
+      setTasks(tasksData);
+      setActivities(activitiesData);
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch data:', error);
